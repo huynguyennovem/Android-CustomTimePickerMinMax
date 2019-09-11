@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="CustomTimePicker">
-        <attr name="max_hour" format="integer"/>
-        <attr name="min_hour" format="integer"/>
-        <attr name="max_minute" format="integer"/>
-        <attr name="min_minute" format="integer"/>
+        <attr name="max_hour_am" format="integer" />
+        <attr name="min_hour_am" format="integer" />
+        <attr name="max_hour_pm" format="integer" />
+        <attr name="min_hour_pm" format="integer" />
+        <attr name="max_minute_am" format="integer" />
+        <attr name="min_minute_am" format="integer" />
+        <attr name="max_minute_pm" format="integer" />
+        <attr name="min_minute_pm" format="integer" />
+        <attr name="minute_interval" format="integer" />
     </declare-styleable>
 
 </resources>

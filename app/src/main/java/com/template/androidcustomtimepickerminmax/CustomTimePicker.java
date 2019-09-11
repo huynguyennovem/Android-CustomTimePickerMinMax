@@ -4,14 +4,20 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.widget.NumberPicker;
 import android.widget.TimePicker;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 public class CustomTimePicker extends TimePicker {
 
-    int minHour, maxHour, minMinute, maxMinute;
+    int minHour_am, maxHour_am, minMinute_am, maxMinute_am;
+    int minHour_pm, maxHour_pm, minMinute_pm, maxMinute_pm;
+    int minuteInterval;
 
     public CustomTimePicker(Context context) {
         super(context);
@@ -29,10 +35,15 @@ public class CustomTimePicker extends TimePicker {
 
     void init(Context context, AttributeSet attrs) {
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.CustomTimePicker);
-        minHour = typedArray.getInt(R.styleable.CustomTimePicker_min_hour, 0);
-        maxHour = typedArray.getInt(R.styleable.CustomTimePicker_max_hour, 0);
-        minMinute = typedArray.getInt(R.styleable.CustomTimePicker_min_minute, 0);
-        maxMinute = typedArray.getInt(R.styleable.CustomTimePicker_min_minute, 0);
+        minHour_am = typedArray.getInt(R.styleable.CustomTimePicker_min_hour_am, 0);
+        maxHour_am = typedArray.getInt(R.styleable.CustomTimePicker_max_hour_am, 0);
+        minMinute_am = typedArray.getInt(R.styleable.CustomTimePicker_min_minute_am, 0);
+        maxMinute_am = typedArray.getInt(R.styleable.CustomTimePicker_max_minute_am, 0);
+        minHour_pm = typedArray.getInt(R.styleable.CustomTimePicker_min_hour_pm, 0);
+        maxHour_pm = typedArray.getInt(R.styleable.CustomTimePicker_max_hour_pm, 0);
+        minMinute_pm = typedArray.getInt(R.styleable.CustomTimePicker_min_minute_pm, 0);
+        maxMinute_pm = typedArray.getInt(R.styleable.CustomTimePicker_max_minute_pm, 0);
+        minuteInterval = typedArray.getInt(R.styleable.CustomTimePicker_minute_interval, 0);
         typedArray.recycle();
     }
 
@@ -45,27 +56,55 @@ public class CustomTimePicker extends TimePicker {
             Class<?> classForid = Class.forName("com.android.internal.R$id");
             Field fieldHour = classForid.getField("hour");
             Field fieldMinute = classForid.getField("minute");
-            final NumberPicker mHourSpinner = findViewById(fieldHour.getInt(null));
-            final NumberPicker mMinuteSpinner = findViewById(fieldMinute.getInt(null));
-            mHourSpinner.setMaxValue(maxHour);
-            mHourSpinner.setMinValue(minHour);
-            mMinuteSpinner.setMaxValue(maxMinute);
-            mMinuteSpinner.setMinValue(minMinute);
             Field amPm = classForid.getField("amPm");
-            mHourSpinner.setMinValue(2);
-            final NumberPicker numberPicker = findViewById(amPm.getInt(null));
-            numberPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+            final NumberPicker hourSpinner = findViewById(fieldHour.getInt(null));
+            final NumberPicker minuteSpinner = findViewById(fieldMinute.getInt(null));
+            final NumberPicker ampmPicker = findViewById(amPm.getInt(null));
+
+            boolean isAM = ampmPicker.getValue() == 0;
+            if (isAM) {
+                hourSpinner.setMinValue(minHour_am);
+                hourSpinner.setMaxValue(maxHour_am);
+                minuteSpinner.setMinValue(minMinute_am);
+                minuteSpinner.setMaxValue(maxMinute_am / minuteInterval);
+                List<String> list = new ArrayList<>();
+                for (int i = minMinute_am; i <= maxMinute_am; i += minuteInterval) {
+                    list.add(String.format(Locale.getDefault(), "%02d", i));
+                }
+                String[] mStringArray = new String[list.size()];
+                mStringArray = list.toArray(mStringArray);
+                minuteSpinner.setDisplayedValues(mStringArray);
+            } else {
+                hourSpinner.setMinValue(minHour_pm);
+                hourSpinner.setMaxValue(maxHour_pm);
+                minuteSpinner.setMinValue(minMinute_pm);
+                minuteSpinner.setMaxValue(maxMinute_pm / minuteInterval);
+                List<String> list = new ArrayList<>();
+                for (int i = minMinute_pm; i <= maxMinute_pm; i += minuteInterval) {
+                    list.add(String.format(Locale.getDefault(), "%02d", i));
+                }
+                String[] mStringArray = new String[list.size()];
+                mStringArray = list.toArray(mStringArray);
+                minuteSpinner.setDisplayedValues(mStringArray);
+            }
+
+            ampmPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
                 @Override
                 public void onValueChange(NumberPicker np1, int oldVal, int newVal) {
                     if (newVal == 0) { // case AM
-                        mHourSpinner.setMinValue(2);
-                        mHourSpinner.setMaxValue(5);
+                        hourSpinner.setMinValue(minHour_am);
+                        hourSpinner.setMaxValue(maxHour_am);
+                        minuteSpinner.setMinValue(minMinute_am);
+                        minuteSpinner.setMaxValue(maxMinute_am / minuteInterval);
                     } else { // case PM
-                        mHourSpinner.setMinValue(1);
-                        mHourSpinner.setMaxValue(8);
+                        hourSpinner.setMinValue(minHour_pm);
+                        hourSpinner.setMaxValue(maxHour_pm);
+                        minuteSpinner.setMinValue(minMinute_pm);
+                        minuteSpinner.setMaxValue(maxMinute_pm / minuteInterval);
                     }
                 }
             });
+
         } catch (Exception e) {
             e.printStackTrace();
         }

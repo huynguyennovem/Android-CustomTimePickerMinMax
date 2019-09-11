@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <com.template.dialogpicker.CustomTimePicker
+    <com.template.androidcustomtimepickerminmax.CustomTimePicker
         android:id="@+id/timePicker"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -14,5 +14,15 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent"
+        app:max_hour_am="11"
+        app:max_hour_pm="17"
+        app:max_minute_am="60"
+        app:max_minute_pm="60"
+        app:min_hour_am="1"
+        app:min_hour_pm="13"
+        app:min_minute_am="0"
+        app:min_minute_pm="0"
+        app:minute_interval="5" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
